@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./script.js" type="module" defer></script>
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Morse Code Translator</title>
+  </head>
+  <body>
+    <h1 class="main-heading">Morse Code Translator</h1>
+    <section id="engSection" class="text-section">
+      <h2 class="text-section__heading">Text</h2>
+      <p class="text-section__description">
+        Type in this box to have morse code appear in the other.
+      </p>
+      <textarea
+        class="text-section__input"
+        name="engInput"
+        id="engInput"
+      ></textarea>
+    </section>
+    <section id="morseSection" class="morse-section">
+      <h2 class="morse-section__heading">Morse Code</h2>
+      <p class="morse-section__description">
+        Type in morse code to have the translation appear in the other box. Put
+        a space between characters and put ' | ' words.
+      </p>
+      <textarea
+        class="morse-section__input"
+        id="morseInput"
+        id="morseInput"
+      ></textarea>
+    </section>
+  </body>
+</html>
