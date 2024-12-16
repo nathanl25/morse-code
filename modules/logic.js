@@ -1,5 +1,11 @@
-import { enToMorseObj, morseToEnObj } from '../assets/morse-code.js';
+import {
+  enToMorseObj,
+  morseToEnObj,
+  asciiToChar,
+} from '../assets/morse-code.js';
 const MORSEDELIM = ' | ';
+const BINARYDELIM = ' 00100000 ';
+const NOASCII = '11111111';
 
 export const engToMorse = (string) => {
   if (typeof string !== 'string') {
@@ -78,4 +84,50 @@ const morseLettersToEng = (accLetters, currLetter) => {
     accLetters += morseToEnObj[currLetter];
   }
   return accLetters;
+};
+
+export const textToBinary = (string) => {
+  if (typeof string !== 'string') {
+    throw new Error('Argument must be a string');
+  }
+  const strArr = strToArr(string, ' ');
+  const binaryStr = strArr.reduce((acc, curr, i, arr) => {
+    acc += wordToBinary(curr);
+    if (i !== arr.length - 1) {
+      acc += BINARYDELIM;
+    }
+    return acc;
+  }, '');
+  return binaryStr;
+};
+
+const wordToBinary = (word) => {
+  let binStr = '';
+  for (let i = 0; i < word.length; i++) {
+    const charCode = word.codePointAt(i);
+    if (asciiToChar[charCode] === undefined) {
+      binStr += NOASCII;
+    } else {
+      binStr += charCode.toString(2).padStart(8, '0');
+    }
+    if (i !== word.length - 1) {
+      binStr += ' ';
+    }
+  }
+  return binStr;
+};
+
+export const binaryToText = (string) => {
+  const arr = string.split(' ');
+  console.log(arr);
+  return arr.reduce((acc, curr) => {
+    if (curr === '') {
+      return acc;
+    }
+    const num = parseInt(curr, 2);
+    asciiToChar[num] !== undefined
+      ? (acc += asciiToChar[num])
+      : (acc += asciiToChar[127]);
+    return acc;
+  }, '');
 };
