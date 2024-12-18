@@ -16,34 +16,36 @@
   <body>
     <h1 class="main-heading">Morse Code Translator</h1>
     <section id="engSection" class="text-section">
-      <h2 class="text-section__heading">Text</h2>
-      <p class="text-section__description">
+      <select name="topSelector" id="topSelector" class="selector">
+        <option selected value="text">Text</option>
+        <option disabled value="morse">Morse Code</option>
+        <option value="binary">Binary</option>
+      </select>
+      <h2 class="text-section__heading" id="topHeading">Text</h2>
+      <p class="text-section__description" id="topDescription">
         Type in this box to have morse code appear in the other.
       </p>
       <textarea
         class="text-section__input"
-        name="engInput"
-        id="engInput"
+        name="topInput"
+        id="topInput"
       ></textarea>
     </section>
     <section id="morseSection" class="morse-section">
-      <select
-        name="morseSelector"
-        id="morseSelector"
-        class="morse-section__selector"
-      >
-        <option value="morse">Morse Code</option>
+      <select name="bottomSelector" id="bottomSelector" class="selector">
+        <option disabled value="text">Text</option>
+        <option selected value="morse">Morse Code</option>
         <option value="binary">Binary</option>
       </select>
-      <h2 class="morse-section__heading">Morse Code</h2>
-      <p class="morse-section__description">
+      <h2 class="morse-section__heading" id="bottomHeading">Morse Code</h2>
+      <p class="morse-section__description" id="bottomDescription">
         Type in morse code to have the translation appear in the other box. Put
-        a space between characters and put ' | ' words.
+        a space between characters and put a ' | ' between words.
       </p>
       <textarea
         class="morse-section__input"
-        id="morseInput"
-        id="morseInput"
+        id="bottomInput"
+        id="bottomInput"
       ></textarea>
     </section>
   </body>

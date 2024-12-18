@@ -1,4 +1,4 @@
-export const enToMorseObj = {
+export const textToMorseObj = {
   A: '.-',
   B: '-...',
   C: '-.-.',
@@ -53,7 +53,7 @@ export const enToMorseObj = {
   UNKNOWN: '\u{FFFD}',
 };
 
-export const asciiToChar = {
+export const binaryToTextObj = {
   32: ' ',
   33: '!',
   34: '"',
@@ -149,10 +149,10 @@ export const asciiToChar = {
   124: '|',
   125: '}',
   126: '~',
-  127: '\u{FFFD}',
+  129: '\u{FFFD}',
 };
 const swapKeyValue = (acc, curr) => {
-  if (curr[0] === 'UNKNOWN' || curr[0] === 127) {
+  if (curr[0] === 'UNKNOWN' || curr[0] === 129) {
     acc[curr[0]] = curr[1];
   } else {
     acc[curr[1]] = curr[0];
@@ -160,37 +160,19 @@ const swapKeyValue = (acc, curr) => {
   return acc;
 };
 
-const morseArr = Object.entries(enToMorseObj);
-const asciiArr = Object.entries(asciiToChar);
-export const morseToEnObj = morseArr.reduce(swapKeyValue, {});
-export const charToAscii = asciiArr.reduce(swapKeyValue, {});
+const morseArr = Object.entries(textToMorseObj);
+const asciiArr = Object.entries(binaryToTextObj);
+export const morseToTextObj = morseArr.reduce(swapKeyValue, {});
 
-// export const morseToEn = {
-//   '.-': 'A',
-//   '-...': 'B',
-//   '-.-.': 'C',
-//   '-..': 'D',
-//   '.': 'E',
-//   '..-.': 'F',
-//   '--.': 'G',
-//   '....': 'H',
-//   '..': 'I',
-//   '.---': 'J',
-//   '-.-': 'K',
-//   '.-..': 'L',
-//   '--': 'M',
-//   '-.': 'N',
-//   '---': 'O',
-//   '.--.': 'P',
-//   '--.-': 'Q',
-//   '.-.': 'R',
-//   '...': 'S',
-//   '-': 'T',
-//   '..-': 'U',
-//   '.--': 'W',
-//   '-..-': 'X',
-//   '-.--': 'Y',
-//   '--..': 'Z',
-//   UNKNOWN: '\u{FFFD}',
-// };
-// 0-9 and symbols
+export const binaryToMorseObj = asciiArr.reduce((acc, curr) => {
+  if (textToMorseObj[curr[1]] !== undefined) {
+    acc[curr[0]] = textToMorseObj[curr[1]];
+  }
+  if (curr[0] === '129') {
+    acc['129'] = curr[1];
+  }
+  return acc;
+}, {});
+
+const binaryToMorseArr = Object.entries(binaryToMorseObj);
+export const morseToBinaryObj = binaryToMorseArr.reduce(swapKeyValue, {});
