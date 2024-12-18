@@ -1,20 +1,13 @@
 import {
-  enToMorseObj,
-  morseToEnObj,
-  asciiToChar,
+  textToMorseObj,
+  morseToTextObj,
+  binaryToTextObj,
+  morseToBinaryObj,
+  binaryToMorseObj,
 } from '../assets/morse-code.js';
 const MORSEDELIM = ' | ';
 const BINARYDELIM = ' 00100000 ';
-const NOASCII = '11111111';
-
-export const engToMorse = (string) => {
-  if (typeof string !== 'string') {
-    throw new Error('Argument must be a string');
-  }
-  const strArr = strToArr(string, ' ');
-  const morseStr = strArr.reduce(engWordsToMorse, '');
-  return morseStr;
-};
+const NOASCII = '10000001';
 
 const strToArr = (str, delimiter) => {
   const arr = str.split(delimiter);
@@ -24,6 +17,15 @@ const strToArr = (str, delimiter) => {
     }
   });
   return filterArr;
+};
+
+export const textToMorse = (string) => {
+  if (typeof string !== 'string') {
+    throw new Error('Argument must be a string');
+  }
+  const strArr = strToArr(string, ' ');
+  const morseStr = strArr.reduce(engWordsToMorse, '');
+  return morseStr;
 };
 
 const engWordsToMorse = (accWords, currWord, wordIndex, wordArr) => {
@@ -36,7 +38,7 @@ const engWordsToMorse = (accWords, currWord, wordIndex, wordArr) => {
 };
 
 const engLettersToMorse = (accLetters, currLetter, letterIndex, letterArr) => {
-  accLetters += enToMorseObj[parseEngLetter(currLetter)];
+  accLetters += textToMorseObj[parseEngLetter(currLetter)];
   if (letterIndex !== letterArr.length - 1) {
     accLetters += ' ';
   }
@@ -47,13 +49,13 @@ const parseEngLetter = (letter) => {
   if (letter.toUpperCase() !== letter.toLowerCase()) {
     return letter.toUpperCase();
   }
-  if (enToMorseObj[letter] === undefined) {
+  if (textToMorseObj[letter] === undefined) {
     return 'UNKNOWN';
   }
   return letter;
 };
 
-export const morseToEng = (string) => {
+export const morseToText = (string) => {
   if (typeof string !== 'string') {
     throw new Error('Argument must be a string');
   }
@@ -78,10 +80,10 @@ const morseWordsToEng = (accWords, currWord, wordIndex, wordArr) => {
 
 // Anything that can't be parsed from morse code will return a unicode value
 const morseLettersToEng = (accLetters, currLetter) => {
-  if (morseToEnObj[currLetter] === undefined) {
-    accLetters += morseToEnObj['UNKNOWN'];
+  if (morseToTextObj[currLetter] === undefined) {
+    accLetters += morseToTextObj['UNKNOWN'];
   } else {
-    accLetters += morseToEnObj[currLetter];
+    accLetters += morseToTextObj[currLetter];
   }
   return accLetters;
 };
@@ -105,7 +107,7 @@ const wordToBinary = (word) => {
   let binStr = '';
   for (let i = 0; i < word.length; i++) {
     const charCode = word.codePointAt(i);
-    if (asciiToChar[charCode] === undefined) {
+    if (binaryToTextObj[charCode] === undefined) {
       binStr += NOASCII;
     } else {
       binStr += charCode.toString(2).padStart(8, '0');
@@ -119,15 +121,93 @@ const wordToBinary = (word) => {
 
 export const binaryToText = (string) => {
   const arr = string.split(' ');
-  console.log(arr);
   return arr.reduce((acc, curr) => {
     if (curr === '') {
       return acc;
     }
     const num = parseInt(curr, 2);
-    asciiToChar[num] !== undefined
-      ? (acc += asciiToChar[num])
-      : (acc += asciiToChar[127]);
+    binaryToTextObj[num] !== undefined
+      ? (acc += binaryToTextObj[num])
+      : (acc += binaryToTextObj[127]);
     return acc;
   }, '');
+};
+
+export const morseToBinary = (string) => {
+  if (typeof string !== 'string') {
+    throw new Error('Argument must be a string');
+  }
+  const strArr = strToArr(string, MORSEDELIM);
+  const morseStr = strArr.reduce(morseWordsToBinary, '');
+  return morseStr;
+};
+
+const morseWordsToBinary = (accWords, currWord, wordIndex, array) => {
+  const letters = strToArr(currWord, ' ');
+  if (letters.every((value) => value === ' ')) {
+    return accWords;
+  }
+  accWords += letters.reduce(morseLettersToBinary, '');
+  if (wordIndex !== array.length - 1) {
+    accWords += BINARYDELIM;
+  }
+  return accWords;
+};
+
+const morseLettersToBinary = (accLetters, currLetter, index, arr) => {
+  if (morseToBinaryObj[currLetter] === undefined) {
+    accLetters += NOASCII;
+  } else {
+    accLetters += Number(morseToBinaryObj[currLetter])
+      .toString(2)
+      .padStart(8, '0');
+  }
+  if (index !== arr.length - 1) {
+    accLetters += ' ';
+  }
+  return accLetters;
+};
+
+export const binaryToMorse = (string) => {
+  if (typeof string !== 'string') {
+    throw new Error('Argument must be a string');
+  }
+  const strArr = strToArr(string, BINARYDELIM);
+  const morseStr = strArr.reduce(binaryWordToMorse, '');
+  return morseStr;
+};
+
+const binaryWordToMorse = (accWords, currWord, wordIndex, wordArr) => {
+  const letters = strToArr(currWord, ' ');
+  accWords += letters.reduce(binaryLettersToMorse, '');
+  if (wordIndex !== wordArr.length - 1) {
+    accWords += MORSEDELIM;
+  }
+  return accWords;
+};
+
+const binaryLettersToMorse = (
+  accLetters,
+  currLetter,
+  letterIndex,
+  letterArr
+) => {
+  accLetters += parseBinaryChar(currLetter);
+  if (letterIndex !== letterArr.length - 1) {
+    accLetters += ' ';
+  }
+  return accLetters;
+};
+
+const parseBinaryChar = (char) => {
+  const charCode = parseInt(char, 2);
+  if (binaryToTextObj[charCode] === undefined) {
+    return binaryToMorseObj['129'];
+  }
+  const uppercaseChar = binaryToTextObj[charCode].toUpperCase();
+  const uppercaseCharCode = uppercaseChar.codePointAt(0);
+  if (binaryToMorseObj[uppercaseCharCode] === undefined) {
+    return binaryToMorseObj['129'];
+  }
+  return binaryToMorseObj[uppercaseCharCode];
 };
