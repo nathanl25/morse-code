@@ -1,4 +1,4 @@
-export const enToMorseObj = {
+export const textToMorseObj = {
   A: '.-',
   B: '-...',
   C: '-.-.',
@@ -50,45 +50,12 @@ export const enToMorseObj = {
   '?': '..--..',
   '/': '-..-.',
   '!': '-.-.--',
-  UNKNOWN: '\u{FFFD}',
 };
 
-const morseArr = Object.entries(enToMorseObj);
-export const morseToEnObj = morseArr.reduce((acc, curr) => {
-  if (curr[0] === 'UNKNOWN') {
-    acc[curr[0]] = curr[1];
-  } else {
+export const morseToTextObj = Object.entries(textToMorseObj).reduce(
+  (acc, curr) => {
     acc[curr[1]] = curr[0];
-  }
-  return acc;
-}, {});
-
-// export const morseToEn = {
-//   '.-': 'A',
-//   '-...': 'B',
-//   '-.-.': 'C',
-//   '-..': 'D',
-//   '.': 'E',
-//   '..-.': 'F',
-//   '--.': 'G',
-//   '....': 'H',
-//   '..': 'I',
-//   '.---': 'J',
-//   '-.-': 'K',
-//   '.-..': 'L',
-//   '--': 'M',
-//   '-.': 'N',
-//   '---': 'O',
-//   '.--.': 'P',
-//   '--.-': 'Q',
-//   '.-.': 'R',
-//   '...': 'S',
-//   '-': 'T',
-//   '..-': 'U',
-//   '.--': 'W',
-//   '-..-': 'X',
-//   '-.--': 'Y',
-//   '--..': 'Z',
-//   UNKNOWN: '\u{FFFD}',
-// };
-// 0-9 and symbols
+    return acc;
+  },
+  {}
+);

@@ -1,16 +1,87 @@
-import { enToMorseObj, morseToEnObj } from '../assets/morse-code.js';
 const MORSEDELIM = ' | ';
+const BINARYDELIM = ' 00100000 ';
+const ERRCHAR = '\u{FFFD}';
 
-export const engToMorse = (string) => {
-  if (typeof string !== 'string') {
-    throw new Error('Argument must be a string');
-  }
-  const strArr = strToArr(string, ' ');
-  const morseStr = strArr.reduce(engWordsToMorse, '');
-  return morseStr;
+export const inputToOutput = (string, obj, type) => {
+  const delimObj = getDelimiters(type);
+  const wordsArr = stringClean(string, delimObj.inWord);
+  const tlWordsArr = wordsArr.reduce((newArr, word) => {
+    const trimmedWord = word.trim();
+    if (trimmedWord === '') {
+      return newArr;
+    }
+    const lettersArr = trimmedWord.split(delimObj.inLtr);
+    const tlLettersArr = lettersArr.reduce((lArr, letter) => {
+      if (letter === '') {
+        return lArr;
+      }
+      let tlLetter = letter;
+      if (obj.type !== 'textToBinary') {
+        tlLetter = letter.toUpperCase();
+      }
+      lArr.push(obj[tlLetter] ?? ERRCHAR);
+      return lArr;
+    }, []);
+    newArr.push(tlLettersArr.join(delimObj.outLtr));
+    return newArr;
+  }, []);
+  return tlWordsArr.join(delimObj.outWord);
 };
 
-const strToArr = (str, delimiter) => {
+const getDelimiters = (type) => {
+  switch (type) {
+    case 'textToMorse':
+      return {
+        inWord: ' ',
+        outWord: MORSEDELIM,
+        inLtr: '',
+        outLtr: ' ',
+      };
+    case 'textToBinary':
+      return {
+        inWord: ' ',
+        outWord: BINARYDELIM,
+        inLtr: '',
+        outLtr: ' ',
+      };
+    case 'binaryToText':
+      return {
+        inWord: BINARYDELIM,
+        outWord: ' ',
+        inLtr: ' ',
+        outLtr: '',
+      };
+    case 'binaryToMorse':
+      return {
+        inWord: BINARYDELIM,
+        outWord: MORSEDELIM,
+        inLtr: ' ',
+        outLtr: ' ',
+      };
+    case 'morseToText':
+      return {
+        inWord: MORSEDELIM,
+        outWord: ' ',
+        inLtr: ' ',
+        outLtr: '',
+      };
+    case 'morseToBinary':
+      return {
+        inWord: MORSEDELIM,
+        outWord: BINARYDELIM,
+        inLtr: ' ',
+        outLtr: ' ',
+      };
+  }
+};
+
+export const checkOutput = (string) => {
+  if (string.includes(ERRCHAR)) {
+    throw new error('Your input contains characters that could not be decoded');
+  }
+  return string;
+};
+const stringClean = (str, delimiter) => {
   const arr = str.split(delimiter);
   const filterArr = arr.filter((value) => {
     if (value !== '') {
@@ -18,64 +89,4 @@ const strToArr = (str, delimiter) => {
     }
   });
   return filterArr;
-};
-
-const engWordsToMorse = (accWords, currWord, wordIndex, wordArr) => {
-  const letters = currWord.split('');
-  accWords += letters.reduce(engLettersToMorse, '');
-  if (wordIndex !== wordArr.length - 1) {
-    accWords += MORSEDELIM;
-  }
-  return accWords;
-};
-
-const engLettersToMorse = (accLetters, currLetter, letterIndex, letterArr) => {
-  accLetters += enToMorseObj[parseEngLetter(currLetter)];
-  if (letterIndex !== letterArr.length - 1) {
-    accLetters += ' ';
-  }
-  return accLetters;
-};
-
-const parseEngLetter = (letter) => {
-  if (letter.toUpperCase() !== letter.toLowerCase()) {
-    return letter.toUpperCase();
-  }
-  if (enToMorseObj[letter] === undefined) {
-    return 'UNKNOWN';
-  }
-  return letter;
-};
-
-export const morseToEng = (string) => {
-  if (typeof string !== 'string') {
-    throw new Error('Argument must be a string');
-  }
-  const strArr = strToArr(string, MORSEDELIM);
-  const morseStr = strArr.reduce(morseWordsToEng, '');
-  return morseStr;
-};
-
-// Split each morse code 'word' into 'letters' due to how the string was split with a delimiter
-// some 'words' can exist as empty values
-const morseWordsToEng = (accWords, currWord, wordIndex, wordArr) => {
-  const letters = strToArr(currWord, ' ');
-  if (letters.every((value) => value === ' ')) {
-    return accWords;
-  }
-  accWords += letters.reduce(morseLettersToEng, '');
-  if (wordIndex !== wordArr.length - 1) {
-    accWords += ' ';
-  }
-  return accWords;
-};
-
-// Anything that can't be parsed from morse code will return a unicode value
-const morseLettersToEng = (accLetters, currLetter) => {
-  if (morseToEnObj[currLetter] === undefined) {
-    accLetters += morseToEnObj['UNKNOWN'];
-  } else {
-    accLetters += morseToEnObj[currLetter];
-  }
-  return accLetters;
 };
