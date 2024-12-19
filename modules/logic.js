@@ -10,18 +10,14 @@ export const inputToOutput = (string, obj, type) => {
     if (trimmedWord === '') {
       return newArr;
     }
-    const lettersArr = trimmedWord.split(delimObj.inLtr);
-    const tlLettersArr = lettersArr.reduce((lArr, letter) => {
-      if (letter === '') {
-        return lArr;
-      }
+    const lettersArr = stringClean(trimmedWord, delimObj.inLtr);
+    const tlLettersArr = lettersArr.map((letter) => {
       let tlLetter = letter;
       if (obj.type !== 'textToBinary') {
         tlLetter = letter.toUpperCase();
       }
-      lArr.push(obj[tlLetter] ?? ERRCHAR);
-      return lArr;
-    }, []);
+      return obj[tlLetter] ?? ERRCHAR;
+    });
     newArr.push(tlLettersArr.join(delimObj.outLtr));
     return newArr;
   }, []);
