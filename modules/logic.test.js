@@ -1,167 +1,234 @@
-import { engToMorse, morseToEng } from './logic.js';
-const DELIM = ' | ';
-const ERRCHAR = '\u{FFFD}';
+import { inputToOutput, checkOutput } from './logic.js';
+import { textToMorseObj, morseToTextObj } from '../assets/morse-code.js';
 
 describe('English to Morse Code', () => {
-  const wrongArgError = new Error('Argument must be a string');
-  test('Basic functionality', () => {
-    expect(engToMorse('E')).toBe('.');
-    expect(engToMorse('MEOW')).toBe('-- . --- .--');
-    expect(engToMorse('ABCDEF')).toBe('.- -... -.-. -.. . ..-.');
-    expect(engToMorse('GHIJK')).toBe('--. .... .. .--- -.-');
-    expect(engToMorse('LMNOP')).toBe('.-.. -- -. --- .--.');
-    expect(engToMorse('QRSTU')).toBe('--.- .-. ... - ..-');
-    expect(engToMorse('VWXYZ')).toBe('...- .-- -..- -.-- --..');
+  test('textToMorse function should be able to translate letters from A-Z', () => {
+    expect(inputToOutput('E', textToMorseObj, 'textToMorse')).toBe('.');
+    expect(inputToOutput('MEOW', textToMorseObj, 'textToMorse')).toBe(
+      '-- . --- .--'
+    );
+    expect(inputToOutput('ABCDEF', textToMorseObj, 'textToMorse')).toBe(
+      '.- -... -.-. -.. . ..-.'
+    );
+    expect(inputToOutput('GHIJK', textToMorseObj, 'textToMorse')).toBe(
+      '--. .... .. .--- -.-'
+    );
+    expect(inputToOutput('LMNOP', textToMorseObj, 'textToMorse')).toBe(
+      '.-.. -- -. --- .--.'
+    );
+    expect(inputToOutput('QRSTU', textToMorseObj, 'textToMorse')).toBe(
+      '--.- .-. ... - ..-'
+    );
+    expect(inputToOutput('VWXYZ', textToMorseObj, 'textToMorse')).toBe(
+      '...- .-- -..- -.-- --..'
+    );
   });
-  test('Parameter Must be a string', () => {
-    expect(() => {
-      engToMorse(0);
-    }).toThrow(wrongArgError);
-    expect(() => {
-      engToMorse(true);
-    }).toThrow(wrongArgError);
-    expect(() => {
-      engToMorse(undefined);
-    }).toThrow(wrongArgError);
-    expect(() => {
-      engToMorse(null);
-    }).toThrow(wrongArgError);
-    expect(() => {
-      engToMorse({});
-    }).toThrow(wrongArgError);
-    expect(() => {
-      engToMorse(['a']);
-    }).toThrow(wrongArgError);
-  });
-  test('Original string should not be modified', () => {
+  test('textToMorse function should not modify original string', () => {
     let str = 'test';
-    const strToMorse = engToMorse(str);
-    expect(engToMorse(str)).toBe('- . ... -');
+    const strToMorse = inputToOutput(str, textToMorseObj, 'textToMorse');
+    expect(inputToOutput(str, textToMorseObj, 'textToMorse')).toBe('- . ... -');
     expect(str).not.toBe(strToMorse);
   });
-  test('String of Words', () => {
-    expect(engToMorse('MEOW MEOW')).toBe(`-- . --- .--${DELIM}-- . --- .--`);
-    expect(engToMorse('I love you')).toBe(
-      `..${DELIM}.-.. --- ...- .${DELIM}-.-- --- ..-`
+  test('textToMorse function should be able to translate a string of words', () => {
+    expect(inputToOutput('MEOW MEOW', textToMorseObj, 'textToMorse')).toBe(
+      `-- . --- .-- | -- . --- .--`
     );
-    expect(engToMorse('this is an example sentence')).toBe(
-      `- .... .. ...${DELIM}.. ...${DELIM}.- -.${DELIM}. -..- .- -- .--. .-.. .${DELIM}... . -. - . -. -.-. .`
+    expect(inputToOutput('I love you', textToMorseObj, 'textToMorse')).toBe(
+      `.. | .-.. --- ...- . | -.-- --- ..-`
+    );
+    expect(
+      inputToOutput(
+        'this is an example sentence',
+        textToMorseObj,
+        'textToMorse'
+      )
+    ).toBe(
+      `- .... .. ... | .. ... | .- -. | . -..- .- -- .--. .-.. . | ... . -. - . -. -.-. .`
     );
   });
-  test('Empty Values', () => {
-    expect(engToMorse('')).toBe('');
-    expect(engToMorse('  ')).toBe('');
+  test('textToMorse function should handle empty spaces', () => {
+    expect(inputToOutput('', textToMorseObj, 'textToMorse')).toBe('');
+    expect(inputToOutput(' ', textToMorseObj, 'textToMorse')).toBe('');
   });
-  test('Excess Whitespace Removal', () => {
-    expect(engToMorse(' ')).toBe('');
-    expect(engToMorse('MEOW')).toBe(engToMorse('     MEOW    '));
+  test('textToMorse function should be able to handle excess whitespace', () => {
+    expect(inputToOutput('  ', textToMorseObj, 'textToMorse')).toBe('');
+    expect(inputToOutput('MEOW', textToMorseObj, 'textToMorse')).toBe(
+      inputToOutput('     MEOW    ', textToMorseObj, 'textToMorse')
+    );
   });
-  test('Numbers', () => {
-    expect(engToMorse('12345')).toBe('.---- ..--- ...-- ....- .....');
-    expect(engToMorse('67890')).toBe('-.... --... ---.. ----. -----');
+  test('textToMorse function should be able to translate numbers', () => {
+    expect(inputToOutput('12345', textToMorseObj, 'textToMorse')).toBe(
+      '.---- ..--- ...-- ....- .....'
+    );
+    expect(inputToOutput('67890', textToMorseObj, 'textToMorse')).toBe(
+      '-.... --... ---.. ----. -----'
+    );
   });
-  test('Case insensitivity', () => {
-    expect(engToMorse('MEOW')).toBe(engToMorse('meow'));
-    expect(engToMorse('ExAmPlE')).toBe(engToMorse('eXaMpLe'));
+  test('textToMorse function should be case insensitive', () => {
+    expect(inputToOutput('MEOW', textToMorseObj, 'textToMorse')).toBe(
+      inputToOutput('meow', textToMorseObj, 'textToMorse')
+    );
+    expect(inputToOutput('ExAmPlE', textToMorseObj, 'textToMorse')).toBe(
+      inputToOutput('eXaMpLe', textToMorseObj, 'textToMorse')
+    );
   });
-  test('Special Characters', () => {
-    expect(engToMorse('!@&()')).toBe('-.-.-- .--.-. .-... -.--. -.--.-');
-    expect(engToMorse('-+=\'"')).toBe('-....- .-.-. -...- .----. .-..-.');
-    expect(engToMorse(',.?/:')).toBe('--..-- .-.-.- ..--.. -..-. ---...');
+  test('textToMorse function should be able to handle certain special characters', () => {
+    expect(inputToOutput('!@&()', textToMorseObj, 'textToMorse')).toBe(
+      '-.-.-- .--.-. .-... -.--. -.--.-'
+    );
+    expect(inputToOutput('-+=\'"', textToMorseObj, 'textToMorse')).toBe(
+      '-....- .-.-. -...- .----. .-..-.'
+    );
+    expect(inputToOutput(',.?/:', textToMorseObj, 'textToMorse')).toBe(
+      '--..-- .-.-.- ..--.. -..-. ---...'
+    );
   });
-  test("Characters that can't be converted", () => {
-    expect(engToMorse('#')).toBe(ERRCHAR);
-    expect(engToMorse('|')).toBe(ERRCHAR);
-    expect(engToMorse('\n')).toBe(ERRCHAR);
-    expect(engToMorse('\u{FFFD}')).toBe(ERRCHAR);
+  test('textToMorse function should translate unrecognised characters as \u{FFFD}', () => {
+    expect(inputToOutput('#', textToMorseObj, 'textToMorse')).toBe('\u{FFFD}');
+    expect(inputToOutput('|', textToMorseObj, 'textToMorse')).toBe('\u{FFFD}');
+    expect(inputToOutput('\u{FFFD}', textToMorseObj, 'textToMorse')).toBe(
+      '\u{FFFD}'
+    );
   });
 });
 
 describe('Morse Code to English', () => {
-  const wrongArgError = new Error('Argument must be a string');
-  test('Parameter Must be a string', () => {
-    expect(() => {
-      morseToEng(0);
-    }).toThrow(wrongArgError);
-    expect(() => {
-      morseToEng(true);
-    }).toThrow(wrongArgError);
-    expect(() => {
-      morseToEng(undefined);
-    }).toThrow(wrongArgError);
-    expect(() => {
-      morseToEng(null);
-    }).toThrow(wrongArgError);
-    expect(() => {
-      morseToEng({});
-    }).toThrow(wrongArgError);
-    expect(() => {
-      morseToEng(['a']);
-    }).toThrow(wrongArgError);
-  });
-  test('Basic functionality', () => {
-    expect(morseToEng('.')).toBe('E');
-    expect(morseToEng('-- . --- .--')).toBe('MEOW');
-    expect(morseToEng('.- -... -.-. -.. . ..-.')).toBe('ABCDEF');
-    expect(morseToEng('--. .... .. .--- -.-')).toBe('GHIJK');
-    expect(morseToEng('.-.. -- -. --- .--.')).toBe('LMNOP');
-    expect(morseToEng('--.- .-. ... - ..-')).toBe('QRSTU');
-    expect(morseToEng('...- .-- -..- -.-- --..')).toBe('VWXYZ');
-  });
-  test('Original string should not be modified', () => {
-    let str = '- . ... -';
-    const strToEng = morseToEng(str);
-    expect(morseToEng(str)).toBe('TEST');
-    expect(str).not.toBe(strToEng);
-  });
-  test('String of Words', () => {
-    expect(morseToEng(`-- . --- .--${DELIM}-- . --- .--`)).toBe(`MEOW MEOW`);
-    expect(morseToEng(`..${DELIM}.-.. --- ...- .${DELIM}-.-- --- ..-`)).toBe(
-      'I LOVE YOU'
+  test('morseToText function should be able to translate letters from A-Z', () => {
+    expect(inputToOutput('.', morseToTextObj, 'morseToText')).toBe('E');
+    expect(inputToOutput('-- . --- .--', morseToTextObj, 'morseToText')).toBe(
+      'MEOW'
     );
     expect(
-      morseToEng(
-        `- .... .. ...${DELIM}.. ...${DELIM}.- -.${DELIM}. -..- .- -- .--. .-.. .${DELIM}... . -. - . -. -.-. .`
+      inputToOutput('.- -... -.-. -.. . ..-.', morseToTextObj, 'morseToText')
+    ).toBe('ABCDEF');
+    expect(
+      inputToOutput('--. .... .. .--- -.-', morseToTextObj, 'morseToText')
+    ).toBe('GHIJK');
+    expect(
+      inputToOutput('.-.. -- -. --- .--.', morseToTextObj, 'morseToText')
+    ).toBe('LMNOP');
+    expect(
+      inputToOutput('--.- .-. ... - ..-', morseToTextObj, 'morseToText')
+    ).toBe('QRSTU');
+    expect(
+      inputToOutput('...- .-- -..- -.-- --..', morseToTextObj, 'morseToText')
+    ).toBe('VWXYZ');
+  });
+  test('morseToText function should not modify original string', () => {
+    let str = '- . ... -';
+    const strToEng = inputToOutput(str, morseToTextObj, 'morseToText');
+    expect(inputToOutput(str, morseToTextObj, 'morseToText')).toBe('TEST');
+    expect(str).not.toBe(strToEng);
+  });
+  test('morseToText function should be able to translate a string of words', () => {
+    expect(
+      inputToOutput(
+        `-- . --- .-- | -- . --- .--`,
+        morseToTextObj,
+        'morseToText'
+      )
+    ).toBe(`MEOW MEOW`);
+    expect(
+      inputToOutput(
+        `.. | .-.. --- ...- . | -.-- --- ..-`,
+        morseToTextObj,
+        'morseToText'
+      )
+    ).toBe('I LOVE YOU');
+    expect(
+      inputToOutput(
+        `- .... .. ... | .. ... | .- -. | . -..- .- -- .--. .-.. . | ... . -. - . -. -.-. .`,
+        morseToTextObj,
+        'morseToText'
       )
     ).toBe('THIS IS AN EXAMPLE SENTENCE');
   });
-  test('String should be in uppercase', () => {
+  test('morseToText function should translate into uppercase letters', () => {
     const lowercaseStr = 'meow';
-    const lowercaseToMorse = engToMorse(lowercaseStr);
-    expect(morseToEng(lowercaseToMorse)).not.toBe(lowercaseStr);
-  });
-  test('Empty Values', () => {
-    expect(morseToEng('')).toBe('');
-    expect(morseToEng('  ')).toBe('');
-  });
-  test('Excess Whitespace Removal', () => {
-    expect(morseToEng(`.${DELIM}`)).toBe('E');
-    expect(morseToEng(' ')).toBe('');
-    expect(morseToEng('-- . --- .--')).toBe(
-      morseToEng('     -- . --- .--    ')
+    const lowercaseToMorse = inputToOutput(
+      lowercaseStr,
+      morseToTextObj,
+      'morseToText'
     );
     expect(
-      morseToEng(`${DELIM}${DELIM}${DELIM} - . ... - ${DELIM}${DELIM}${DELIM}`)
-    ).toBe('TEST');
-    expect(morseToEng(`${DELIM} ${DELIM} ${DELIM}`)).toBe('');
+      inputToOutput(lowercaseToMorse, morseToTextObj, 'morseToText')
+    ).not.toBe(lowercaseStr);
+  });
+  test('morseToText function should handle empty values', () => {
+    expect(inputToOutput('', morseToTextObj, 'morseToText')).toBe('');
+    expect(inputToOutput(' ', morseToTextObj, 'morseToText')).toBe('');
+  });
+  test('morseToText function should be able to handle excess whitespace', () => {
+    expect(inputToOutput(`. | `, morseToTextObj, 'morseToText')).toBe('E');
+    expect(inputToOutput('  ', morseToTextObj, 'morseToText')).toBe('');
+    expect(inputToOutput('-- . --- .--', morseToTextObj, 'morseToText')).toBe(
+      inputToOutput(
+        '     --    .    ---    .--    ',
+        morseToTextObj,
+        'morseToText'
+      )
+    );
     expect(
-      morseToEng(
-        `..${DELIM}  ${DELIM}  ${DELIM}.-.. --- ...- .${DELIM} ${DELIM}  ${DELIM}  ${DELIM}-.-- --- ..-`
+      inputToOutput(
+        ` |  |  |  - . ... -  |  |  | `,
+        morseToTextObj,
+        'morseToText'
+      )
+    ).toBe('TEST');
+    expect(inputToOutput(` |   |   | `, morseToTextObj, 'morseToText')).toBe(
+      ''
+    );
+    expect(
+      inputToOutput(
+        `.. |    |    | .-.. --- ...- . |   |    |    | -.-- --- ..-`,
+        morseToTextObj,
+        'morseToText'
       )
     ).toBe('I LOVE YOU');
   });
-  test('Numbers', () => {
-    expect(morseToEng('.---- ..--- ...-- ....- .....')).toBe('12345');
-    expect(morseToEng('-.... --... ---.. ----. -----')).toBe('67890');
+  test('morseToText function should be able to translate numbers', () => {
+    expect(
+      inputToOutput(
+        '.---- ..--- ...-- ....- .....',
+        morseToTextObj,
+        'morseToText'
+      )
+    ).toBe('12345');
+    expect(
+      inputToOutput(
+        '-.... --... ---.. ----. -----',
+        morseToTextObj,
+        'morseToText'
+      )
+    ).toBe('67890');
   });
-  test('Special Characters', () => {
-    expect(morseToEng('-.-.-- .--.-. .-... -.--. -.--.-')).toBe('!@&()');
-    expect(morseToEng('-....- .-.-. -...- .----. .-..-.')).toBe('-+=\'"');
-    expect(morseToEng('--..-- .-.-.- ..--.. -..-. ---...')).toBe(',.?/:');
+  test('morseToText function should be able to handle certain special characters', () => {
+    expect(
+      inputToOutput(
+        '-.-.-- .--.-. .-... -.--. -.--.-',
+        morseToTextObj,
+        'morseToText'
+      )
+    ).toBe('!@&()');
+    expect(
+      inputToOutput(
+        '-....- .-.-. -...- .----. .-..-.',
+        morseToTextObj,
+        'morseToText'
+      )
+    ).toBe('-+=\'"');
+    expect(
+      inputToOutput(
+        '--..-- .-.-.- ..--.. -..-. ---...',
+        morseToTextObj,
+        'morseToText'
+      )
+    ).toBe(',.?/:');
   });
-  test("Characters that can't be converted", () => {
-    expect(morseToEng('#')).toBe(ERRCHAR);
-    expect(morseToEng('\n')).toBe(ERRCHAR);
-    expect(morseToEng('\u{FFFD}')).toBe(ERRCHAR);
+  test('morseToText function should translate unrecognised characters as \u{FFFD}', () => {
+    expect(inputToOutput('#', morseToTextObj, 'morseToText')).toBe('\u{FFFD}');
+    expect(inputToOutput('\u{FFFD}', morseToTextObj, 'morseToText')).toBe(
+      '\u{FFFD}'
+    );
   });
 });
